@@ -1,0 +1,4 @@
+This Repo is made for create, store and update the homework and projects of the Non Parametric
+class thought by Jorge De la Vega. The team is conformed by Santiago Muriel and Sofia de la Mora.
+
+
