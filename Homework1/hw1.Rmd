@@ -28,3 +28,169 @@ plot(pressure)
 ```
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+---
+title: "homework1"
+author: "Santiago,Sofía,Román"
+date: "26/1/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+#Ejercicio 8
+
+```{r}
+library(ggplot2)
+library(plyr)  
+library(Rmisc)
+library(plotrix)
+data("faithful")
+head(faithful)
+```
+
+```{r}
+#Media
+tiempo_prom_esp<-mean(faithful$waiting)
+err_es_mean<-std.error(faithful$waiting)
+interv_conf<-CI(faithful$waiting, ci=0.90)
+```
+
+```{r}
+#Mediana
+mediana_tiempo_esp<-median(faithful$waiting)
+err_es_median<-1.253* sd(faithful$waiting)/sqrt(length(faithful$waiting))
+```
+
+#Ejercicio 9
+
+```{r}
+data("quakes")
+head(quakes)
+```
+
+```{r}
+data <- quakes$mag
+eps <- sqrt(1/(2*length(data)) * log(2/0.05))
+plot(sort(data), ecdf(data)(sort(data)), type = "S")
+abline(h = 1, lty = 2, col = "gray", lwd = 2)#linea horizontal en el 1
+rug(sort(data), ticksize=0.02, col = "blue") 
+lines(sort(data),ecdf(data)(sort(data)) - eps, col = "red", type = "S")
+lines(sort(data),ecdf(data)(sort(data)) + eps, col = "red", type = "S")
+```
+
+#Calcular el IC para F(4.9) − F(4.3)
+
+```{r}
+fn<-ecdf(data)
+dif<-fn(4.9)-fn(4.3)
+n<-length(data)
+s<-sd(data)
+error <- qnorm(0.975)*s/sqrt(n)
+left<-dif-error
+right<-dif+error
+left
+right
+```
+ 
+#Ejercicio 10
+
+```{r}
+set.seed(1)
+sim_norm<-rnorm(100,0,1)
+sim_norm_sort<-sort(sim_norm)
+n = length(sim_norm)
+plot(sim_norm_sort, ecdf(sim_norm)(sim_norm_sort), type = 's', ylim = c(0, 1), 
+     xlab = 'sample', ylab = '', main = 'Empirical Cumluative Distribution')
+L<-1:n
+U<-1:n
+  epsilon_i = sqrt(log(2/0.05)/(2*n))
+  L=pmax(1:n/n-epsilon_i, 0)
+  U=pmin(1:n/n+epsilon_i, 1)
+  lines(sim_norm_sort, U, col="blue")
+  lines(sim_norm_sort, L, col="blue")
+  rug(sim_norm_sort, ticksize=0.02, col = "orange")
+#using clt:
+U2=(1:n/n)+1.96*sqrt( (1:n/n)*(1-1:n/n)/n )
+L2=(1:n/n)-1.96*sqrt( (1:n/n)*(1-1:n/n)/n )
+lines(sim_norm_sort, L2, col="red")
+lines(sim_norm_sort, U2, col="red")
+```
+
+```{r}
+rep<- replicate(1000, rnorm(100))
+tint <- matrix(NA, nrow = dim(rep)[2], ncol = 2)
+for (i in 1:dim(rep)[2]) {
+    temp <- t.test(rep[, i], conf.level = 0.9)
+    tint[i, ] <- temp$conf.int
+}
+colnames(tint) <- c("lcl", "ucl")
+width <- apply(tint, 1, diff)
+tint <- cbind(tint, width)
+tint <- data.frame(tint)
+indx <- (tint$lcl <= 0) & (tint$ucl >= 0)
+prop<-sum(indx)/1000
+prop
+```
+
+
+```{r}
+sim_cauch<-rcauchy(100)
+sim_cauch_sort<-sort(sim_cauch)
+n = length(sim_cauch)
+plot(sim_cauch_sort, ecdf(sim_cauch)(sim_cauch_sort), type = 's', ylim = c(0, 1), 
+     xlab = 'sample', ylab = '', main = 'Empirical Cumluative Distribution')
+L<-1:n
+U<-1:n
+  epsilon_ii = sqrt(log(2/0.05)/(2*n))
+  L=pmax(1:n/n-epsilon_ii, 0)
+  U=pmin(1:n/n+epsilon_ii, 1)
+  lines(sim_cauch_sort, U, col="blue")
+  lines(sim_cauch_sort, L, col="blue")
+  rug(sim_cauch_sort, ticksize=0.02, col = "orange")
+#using clt:
+U22=(1:n/n)+1.96*sqrt( (1:n/n)*(1-1:n/n)/n )
+L22=(1:n/n)-1.96*sqrt( (1:n/n)*(1-1:n/n)/n )
+lines(sim_cauch_sort, L22, col="red")
+lines(sim_cauch_sort, U22, col="red")
+```
+
+
+
+````{r}
+set.seed(9)
+rep<- replicate(1000, rcauchy(100))
+tint <- matrix(NA, nrow = dim(rep)[2], ncol = 2)
+for (i in 1:dim(rep)[2]) {
+    temp <- t.test(rep[, i], conf.level = 0.9)
+    tint[i, ] <- temp$conf.int
+}
+colnames(tint) <- c("lcl", "ucl")
+width <- apply(tint, 1, diff)
+tint <- cbind(tint, width)
+tint <- data.frame(tint)
+indx <- (tint$lcl <= 0) & (tint$ucl >= 0)
+prop1<-sum(indx)/1000
+prop1
+```
