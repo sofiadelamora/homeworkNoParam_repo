@@ -28,3 +28,62 @@ plot(pressure)
 ```
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+#Ejercicio 8
+
+```{r}
+library(ggplot2)
+library(plyr)  
+library(Rmisc)
+library(plotrix)
+data("faithful")
+head(faithful)
+```
+
+```{r}
+#Media
+tiempo_prom_esp<-mean(faithful$waiting)
+err_es_mean<-std.error(faithful$waiting)
+interv_conf<-CI(faithful$waiting, ci=0.90)
+```
+
+```{r}
+#Mediana
+mediana_tiempo_esp<-median(faithful$waiting)
+err_es_median<-1.253* sd(faithful$waiting)/sqrt(length(faithful$waiting))
+```
+
+#Ejercicio 9
+
+```{r}
+data("quakes")
+head(quakes)
+```
+
+```{r}
+data <- quakes$mag
+eps <- sqrt(1/(2*length(data)) * log(2/0.05))
+plot(sort(data), ecdf(data)(sort(data)), type = "S")
+abline(h = 1, lty = 2, col = "gray", lwd = 2)
+rug(sort(data), ticksize=0.02, col = "blue")
+lines(sort(data),ecdf(data)(sort(data)) - eps, col = "red", type = "S")
+lines(sort(data),ecdf(data)(sort(data)) + eps, col = "red", type = "S")
+```
+
+
+```{r}
+#falta definirlo para la función
+interv_conf<-CI(faithful$waiting, ci=0.95)
+```
+ 
+#Ejercicio 10
+
+```{r}
+normal<-rnorm(100,0,1)
+epsi <- sqrt(1/(2*length(normal)) * log(2/0.05))
+plot(sort(normal), ecdf(normal)(sort(normal)), type = "S")
+abline(h = 1, lty = 2, col = "gray", lwd = 2)
+rug(sort(normal), ticksize=0.02, col = "blue")
+lines(sort(normal),ecdf(normal)(sort(normal)) - epsi, col = "red", type = "S")
+lines(sort(normal),ecdf(normal)(sort(normal)) + epsi, col = "red", type = "S")
+```
