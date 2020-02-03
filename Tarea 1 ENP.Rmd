@@ -1,0 +1,36 @@
+---
+title: "Tarea1 - Ejercicio 7"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+7. Comparar computacionalmente la cobertura y longitud de
+ˆ pn ±zα/2rˆ pn(1− ˆ pn) n donde X1,...,Xn ∼ iid Bernoulli(p) y ˆ pn = ¯ x. Tomar p = 0.2 y usar α = 0.05. Tratar con varios tamaños de n. £Qué tan grande debe ser n para que el intervalo tenga cobertura adecuada?
+
+**Solución**
+Realizaremos una simulación de Bernoulli para tamaños de muestra n = 5, 10, 20, 30, 40, 50 y 100. Veremos la longitud y de cobertura para cada tamaño de muestra. Al final, graficaremos n vs Cobertura para ver con qué tamaño conseguimos una cobertura adecuada (> 95%).
+
+```{r}
+set.seed(1234)
+n <- c(5,10,20,30,40,50,100)
+long <- c()
+cob <- c()
+for(i in 1:length(n))
+{
+Xi <- rbinom(n[i], size = 1, prob = .2)
+Xn <- mean(Xi)
+IC <- Xn + c(-1,1)*qnorm(.975)*sqrt(Xn*(1-Xn)/n[i])
+long[i] = IC[2] - IC[1]
+cat("n =", n[i], " -> Longitud:", long[i])
+cob[i] = pbinom(n[i]*IC[2],size = n[i], prob = .2) - pbinom(n[i]*IC[1],size = n[i], prob = .2)
+cat("\t y Cobertura:", cob[i], "\n")
+}
+
+plot(n,cob, ylim=c(.65, 1), ylab = "Cobertura", main = "Tamañano de muestra vs Cobertura")
+```
+
