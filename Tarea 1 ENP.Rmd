@@ -1,18 +1,15 @@
 ---
 title: "Tarea1 - Ejercicio 7"
-output:
-  html_document: default
-  pdf_document: default
+output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-7. Comparar computacionalmente la cobertura y longitud de
-ˆ pn ±zα/2rˆ pn(1− ˆ pn) n donde X1,...,Xn ∼ iid Bernoulli(p) y ˆ pn = ¯ x. Tomar p = 0.2 y usar α = 0.05. Tratar con varios tamaños de n. £Qué tan grande debe ser n para que el intervalo tenga cobertura adecuada?
+# Ejercicio 7
 
-**Solución**
+## Solución
 Realizaremos una simulación de Bernoulli para tamaños de muestra n = 5, 10, 20, 30, 40, 50 y 100. Veremos la longitud y de cobertura para cada tamaño de muestra. Al final, graficaremos n vs Cobertura para ver con qué tamaño conseguimos una cobertura adecuada (> 95%).
 
 ```{r}
