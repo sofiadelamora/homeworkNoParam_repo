@@ -1,0 +1,54 @@
+---
+title: "Tarea 2"
+author: "Santiago, Sofía, Román, Individuo4"
+date: "8/2/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+set.seed(20200208) #created at date
+
+# assigning number of excercises 
+(people_3quest <- sample(x = c("Sant","Sof","Roman","Ind4"),replace = F, size = 2)) #people with 3 questions, by alphabetic order
+
+
+# assinging excersises
+number_ex <- 1:10 #excercises 
+
+cat("\nEjercicios Santiago: ")
+(ex_sant <- sample(x = number_ex, replace = F, size = 3))
+number_ex <- number_ex[! number_ex %in% ex_sant] #removing questions 
+
+cat("\nEjercicios Sofia: ")
+(ex_sof <- sample(x = number_ex, replace = F, size = 2))
+number_ex <- number_ex[! number_ex %in% ex_sof] #removing questions 
+
+cat("\nEjercicios Roman: ")
+(ex_rom <- sample(x = number_ex, replace = F, size = 3))
+number_ex <- number_ex[! number_ex %in% ex_rom] #removing questions 
+
+cat("\nEjercicios Individuo4: ")
+(ex_ind4 <- number_ex)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
