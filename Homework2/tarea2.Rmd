@@ -1,0 +1,222 @@
+---
+title: "tarea2_NP"
+output: html_document
+---
+
+##Ejercicio 1
+a)Probar a un nivel de signficancia que no exceda $0.10$ la hipótesis nula $H_0 : M = 2$ vs.
+$H_a : M > 2$, donde $M$ es la mediana de una población simétrica continua de la cual se
+extrae la muestra aleatoria:
+                                        −3, −6, 1, 9, 4, 10, 12
+## i) Respuestas con la prueba del signo:
+```{r}
+#Esto lo hice con la prueba de la potencia, no se pide, de hecho no se puede sacaar
+#x<-c(−3, −6, 1, 9, 4, 10, 12)
+#mu<-mean(x)
+#sd<-sd(x)
+#alpha<-0.05
+#x_s<-sort(x)
+#Primer hay que encontrar un kappa para un alpha dado (0.05). Generamos una binomial con los parámetros dados
+#bin<-round(pbinom(0:15, size = length(x), prob = 0.5),3) 
+#(k<-sum(bin < alpha))
+#(alpha_exacto<-bin[1])
+```
+Nota personal: Usamos la mediana porque es una medida no paramétrica.
+```{r}
+set.seed(10)
+y<-c(−3, −6, 1, 9, 4, 10, 12)
+```
+Notemos que tenemos 4 observaciones que son mayores que 2.Tenemos una muestra un tanto extrema, pero qué tan extrema?
+
+Sea y el número se casos mayores que dos.
+
+```{r}
+binom.test(x = 4,n = 7,p = 0.5,conf.level = 0.95) 
+```
+Por lo tanto, no rechazamos $H_0$, es decir, la mediana es $M=2$.
+
+b)Dar la probabilidad exacta de un error tipo I en (a).
+Recordemos que dicha probabilidad es el nivel de significancia y la obtenemos con l+n-s en el caso de estimación de cuantiles.
+
+```{r}
+n=10000 # testing 10,000 times
+t1err=0
+for (i in 1:n){
+   x=rbinom(4,7,0.5)
+   if ((binom.test(4,7)$p.value)<=0.05) (t1err=t1err+1) 
+}
+cat("Type I error rate in percentage is", (t1err/n))
+```
+
+```{r}
+library(BSDA)
+
+SIGN.test(y,
+          md = 2)
+```
+
+```{r}
+library(DescTools)
+
+SignTest(y,
+          mu = 2)
+```
+
+c)
+```{r}
+a<-c(126,131,153,125,119,102,116,163)
+b<-c(120,126,156,129,102,105,100,175)
+dif<-a-b
+dif
+```
+
+```{r}
+binom.test(8, 8) 
+```
+El p- value es muy pequeño, rechazamoz la hipótesis nula.
+
+d)
+```{r}
+n=10000 # testing 10,000 times
+t1=0
+for (i in 1:n){
+   if ((binom.test(8,8)$p.value)<=0.05) (t1=t1+1) 
+}
+cat("Type I error rate in percentage is", (t1/n))
+```
+
+e)
+
+```{r}
+binom.test(8,8)$conf.int
+```
+
+##Ejercicio 6
+A una muestra de tres niñas y cinco niños se les dan instrucciones sobre cómo armar un
+lego. Luego se les pide armar el lego una y otra vez hasta que lo hagan correctamente.
+El número de repeticiones necesarias para una terminación correcta son 1,2, y 5 para
+las niñas, y 4,8,9,10 y 12 para los niños. Encontrar el p−valor de la alternativa que en
+promedio las niñas aprenden la actividad más rápido que los niños, y encontrar el intervalo
+de confianza estimado de la diferencia $\theta = M_Y − M_X$ con un coeficiente de confianza al
+menos igual a 0.85, usando la prueba de la mediana.
+
+```{r}
+na<-c(1,2,5)
+no<-c(4,8,9,10,12)
+```
+ Primero encontremos el p-value de $H_0:M_Y = M_X$ $H_0:M_Y < M_X$en promedio las niñas aprenden más rápido que los niños.
+
+Tenemos dos muestras aleatorias independientes, entonces podemos usar el Mann-whitney test.
+
+sacamos los rangos para ambos grupos
+```{r}
+nar<-c(1,2,4)
+nor<-c(3,5,6,7,8)
+```
+
+Ahora obtenemos la suma de los rangos de cada grupo
+
+```{r}
+sum_nar<-sum(nar)
+sum_nor<-sum(nor)
+sum_nar
+sum_nor
+```
+elegimos la muestra que tiene menos observaciones para que nuestra t statistic:
+
+```{r}
+t1=sum_nar
+e<-0.5*3*(3+5+1) #expected value de t1
+e
+```
+
+Viendo a la tabl obtenemos (7, 20) de intervalo de confianza de $\theta = M_Y − M_X$ y tenemos una t estadística de 7, entonces rechazamos con un p-value de .0357 y un nivel de confianza de 0.05
+
+Ahora agámoslo con funciones
+
+```{r}
+wilcox.test(nar,nor,alternative = "greater",
+            paired = FALSE, exact = TRUE, correct = FALSE,
+            conf.int = TRUE, conf.level = 0.85,
+             digits.rank = Inf)
+```
+
+Notemos que el p-value es mayor que alpha=.15, entonces no rechazamos la hipótesis nula, es decir, la mediana de las niñas es mayor que la de los niños.
+
+El intervalo de confianza para $\theta = M_Y − M_X$ es
+
+```{r}
+wilcox.test(nar,nor,alternative = "greater",
+            paired = FALSE, exact = TRUE, correct = FALSE,
+            conf.int = TRUE, conf.level = 0.85,
+             digits.rank = Inf)$conf.int
+```
+
+## Ejercicio 9
+
+Ocho voluntarios fueron reclutados para probar la eficacia de usar un telescopio en un
+rifle. Se cree que el uso del telescopio aumentará los puntajes en un rango de tiro. Para
+probar esto, los ocho voluntarios se les pidió usar un rifle en un rango de tiro, tanto con
+un telescopio en la mira como sin telescopio en la mira de los rifles, usando un patrón
+alternado aleatorio entre ambos. Los resultado fueron:
+
+¿Las miras telescópicas resultan en puntajes más altos?
+
+a) Usar una prueba basada sólo en rangos. Encontrar el p-valor en tres formas diferentes:
+(1) encontrar el p-valor exacto, (2) Usar la aproximación normal sin corrección por
+continuidad y (3) Usar la aproximación normal con la corrección de continuidad.
+
+
+```{r}
+w<-c(96, 93, 89, 88, 85, 83, 80, 77)
+z<-c(92, 92, 89, 96, 82, 79, 80, 78)
+```
+
+(1) p-value exacto
+```{r}
+wilcox.test(w,z,alternative = "two.sided",
+            paired = FALSE, exact = TRUE, correct = FALSE,
+            conf.int = TRUE, conf.level = 0.85,
+             digits.rank = Inf)
+```
+
+(2)Usar la aproximación normal sin corrección por continuidad ¿cómo se le deja la normal sin que se corrija? Me sale igual que con p-value exacto
+
+```{r}
+wilcox.test(w,z,alternative = "two.sided",
+            paired = FALSE, exact = FALSE, correct = FALSE,
+            conf.int = TRUE, conf.level = 0.85,
+             digits.rank = Inf)
+```
+
+(3)Usar la aproximación normal con la corrección de continuidad
+```{r}
+wilcox.test(w,z,alternative = "two.sided",
+            paired = FALSE, exact = FALSE, correct = TRUE,
+            conf.int = TRUE, conf.level = 0.85,
+             digits.rank = Inf)
+```
+
+b)Usar una prueba basada en normalidad. FALTA ESTA
+
+
+
+c)Usar una prueba de aleatorización tipo Fisher
+
+```{r}
+t.test(w, z, alternative = "two.sided", var.equal = FALSE)
+```
+
+
+d)Encontrar un intervalo de confianza para la mejora en el puntaje obtenida usando una
+mira telescópica
+```{r}
+library(gmodels)
+mejora<-w-z
+ci(x, confidence=0.95)
+```
+Tenemos que el intervalo es [1.91,5.09]
+
+
+
+
