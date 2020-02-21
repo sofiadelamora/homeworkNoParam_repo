@@ -1,0 +1,138 @@
+---
+title: "tarea2_NP"
+output: html_document
+---
+##Ejercicio 6
+A una muestra de tres niñas y cinco niños se les dan instrucciones sobre cómo armar un
+lego. Luego se les pide armar el lego una y otra vez hasta que lo hagan correctamente.
+El número de repeticiones necesarias para una terminación correcta son 1,2, y 5 para
+las niñas, y 4,8,9,10 y 12 para los niños. Encontrar el p−valor de la alternativa que en
+promedio las niñas aprenden la actividad más rápido que los niños, y encontrar el intervalo
+de confianza estimado de la diferencia $\theta = M_Y − M_X$ con un coeficiente de confianza al
+menos igual a 0.85, usando la prueba de la mediana.
+
+```{r}
+na<-c(1,2,5)
+no<-c(4,8,9,10,12)
+n<-length(nar)
+m<-length(nor)
+N<-n+m
+names(na) <- rep("x",n)
+names(no) <- rep("Y",m)
+```
+ Primero encontremos el p-value de $H_0:M_Y = M_X$ $H_0:M_Y < M_X$en promedio las niñas aprenden más rápido que los niños.
+
+Tenemos dos muestras aleatorias independientes, entonces podemos usar el Mann-whitney test.
+
+Sacamos los rangos para ambos grupos
+```{r}
+(w <- sort(c(na,no)))
+(Rw <- rank(w,ties.method = "average"))
+```
+
+Ahora obtenemos la suma de los rangos de cada grupo
+
+```{r}
+Rw[names(Rw) == "x"]
+(Tx <- sum(Rw[names(Rw) == "x"]))
+```
+
+```{r}
+(T1<-Tx-n*(N+1)/2)/sqrt(n*m/(N*(N-1))*sum(Rw^2) - n*m*(N+1)^2/(4*(N-1)))
+(pval <- 1-pnorm(T1))
+```
+
+No rechazamos con un p-value de 1 y un nivel de confianza de 0.05
+
+Ahora agámoslo con funciones
+
+```{r}
+wilcox.test(x=na,y=no,alternative = "greater",
+            paired = FALSE, exact = TRUE, correct = FALSE,
+            conf.int = TRUE, conf.level = 0.85,
+             digits.rank = Inf)
+```
+
+Notemos que el p-value es grande, entonces no rechazamos la hipótesis nula, es decir, la mediana de las niñas es mayor que la de los niños.
+
+El intervalo de confianza para $\theta = M_Y − M_X$ es
+
+```{r}
+wilcox.test(x=na,y=no,alternative = "greater",
+            paired = FALSE, exact = TRUE, correct = FALSE,
+            conf.int = TRUE, conf.level = 0.85,
+             digits.rank = Inf)$conf.int
+```
+
+## Ejercicio 9
+
+Ocho voluntarios fueron reclutados para probar la eficacia de usar un telescopio en un
+rifle. Se cree que el uso del telescopio aumentará los puntajes en un rango de tiro. Para
+probar esto, los ocho voluntarios se les pidió usar un rifle en un rango de tiro, tanto con
+un telescopio en la mira como sin telescopio en la mira de los rifles, usando un patrón
+alternado aleatorio entre ambos. Los resultado fueron:
+
+¿Las miras telescópicas resultan en puntajes más altos?
+
+a) Usar una prueba basada sólo en rangos. Encontrar el p-valor en tres formas diferentes:
+(1) encontrar el p-valor exacto, (2) Usar la aproximación normal sin corrección por
+continuidad y (3) Usar la aproximación normal con la corrección de continuidad.
+
+
+```{r}
+w<-c(96, 93, 89, 88, 85, 83, 80, 77)
+z<-c(92, 92, 89, 96, 82, 79, 80, 78)
+dif<-w-z
+```
+
+(1) p-value exacto
+```{r}
+wilcox.test(w,z,alternative = "two.sided",
+            paired = FALSE, exact = TRUE, correct = FALSE,
+            conf.int = TRUE, conf.level = 0.85,
+             digits.rank = Inf)
+```
+
+(2)Usar la aproximación normal sin corrección por continuidad ¿cómo se le deja la normal sin que se corrija? Me sale igual que con p-value exacto
+
+```{r}
+wilcox.test(w,z,alternative = "two.sided",
+            paired = FALSE, exact = FALSE, correct = FALSE,
+            conf.int = TRUE, conf.level = 0.85,
+             digits.rank = Inf)
+```
+
+(3)Usar la aproximación normal con la corrección de continuidad
+```{r}
+wilcox.test(w,z,alternative = "two.sided",
+            paired = FALSE, exact = FALSE, correct = TRUE,
+            conf.int = TRUE, conf.level = 0.85,
+             digits.rank = Inf)
+```
+
+b)Usar una prueba basada en normalidad. FALTA ESTA
+
+```{r}
+shapiro.test(dif)
+```
+Tiene un p-value mayor a 0.05, entonces no rechazamos $H_0$.
+
+c)Usar una prueba de aleatorización tipo Fisher
+
+```{r}
+#fisher.test(w, z, alternative = "two.sided") la veremos en clase
+```
+
+
+d)Encontrar un intervalo de confianza para la mejora en el puntaje obtenida usando una
+mira telescópica
+```{r}
+library(gmodels)
+mejora<-dif
+ci(mejora, confidence=0.95)
+```
+Tenemos que el intervalo es [-2.876358, 3.626358]
+
+
+
+
